@@ -1,7 +1,10 @@
 pipeline {
-  agent none
+  agent {
+    kubernetes {
+      dockerInside('maven')
+    }
+  }
   stages {
-    dockerInside('maven') {
     stage('Build') {
       steps {
         sh 'mvn clean source:jar package'
