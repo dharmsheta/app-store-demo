@@ -1,8 +1,7 @@
 pipeline {
-  agent {
-     dockerInside('maven')
-  }
+  agent none
   stages {
+    dockerInside('maven') {
     stage('Build') {
       steps {
         sh 'mvn clean source:jar package'
@@ -44,7 +43,8 @@ pipeline {
         sh 'mvn source:jar package -Dmaven.test.skip'
       }
     }
-  }
+    }
+    }
   post {
     always {
       junit '**/target/surefire-reports/TEST-*.xml'
