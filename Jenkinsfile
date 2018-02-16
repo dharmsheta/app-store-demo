@@ -1,7 +1,6 @@
 pipeline {
   agent {
     kubernetes {
-      //cloud 'kubernetes'
       label 'kubernetes'
       containerTemplate {
         name 'maven'
@@ -9,7 +8,9 @@ pipeline {
         ttyEnabled true
         command 'cat'
       }
+      
     }
+    
   }
   stages {
     stage('Build') {
@@ -18,29 +19,31 @@ pipeline {
       }
     }
     stage('Browser Tests') {
-      steps {
-        parallel(
-          "Firefox": {
+      parallel {
+        stage('Firefox') {
+          steps {
             sh 'echo \'setting up selenium environment\''
             sh 'ping -c 5 localhost'
-            
-          },
-          "Safari": {
+          }
+        }
+        stage('Safari') {
+          steps {
             sh 'echo \'setting up selenium environment\''
             sh 'ping -c 8 localhost'
-            
-          },
-          "Chrome": {
+          }
+        }
+        stage('Chrome') {
+          steps {
             sh 'echo \'setting up selenium environment\''
             sh 'ping -c 3 localhost'
-            
-          },
-          "Internet Explorer": {
+          }
+        }
+        stage('Internet Explorer') {
+          steps {
             sh 'echo \'setting up selenium environment\''
             sh 'ping -c 4 localhost'
-            
           }
-        )
+        }
       }
     }
     stage('Static Analysis') {
@@ -53,12 +56,5 @@ pipeline {
         sh 'mvn source:jar package -Dmaven.test.skip'
       }
     }
-    }
-    }
-  post {
-    always {
-      junit '**/target/surefire-reports/TEST-*.xml'
-      archive '**/target/*.jar'
-      
-    }
+  }
 }
